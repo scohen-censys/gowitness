@@ -8,6 +8,7 @@ import (
 
 	"github.com/sensepost/gowitness/internal/islazy"
 	"github.com/sensepost/gowitness/pkg/log"
+	"github.com/sensepost/gowitness/pkg/runner"
 )
 
 type CidrReader struct {
@@ -32,7 +33,7 @@ func NewCidrReader(opts *CidrReaderOptions) *CidrReader {
 	}
 }
 
-func (cr *CidrReader) Read(ch chan<- string) error {
+func (cr *CidrReader) Read(ch chan<- runner.Request) error {
 	defer close(ch)
 
 	candidates, err := cr.candidates()
@@ -43,7 +44,7 @@ func (cr *CidrReader) Read(ch chan<- string) error {
 	log.Debug("total candidates to scan", "total", len(candidates))
 
 	for _, target := range candidates {
-		ch <- target
+		ch <- runner.Request{Target: target}
 	}
 
 	return nil

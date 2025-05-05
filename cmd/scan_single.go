@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/sensepost/gowitness/internal/ascii"
+	"github.com/sensepost/gowitness/pkg/runner"
 	"github.com/spf13/cobra"
 )
 
@@ -38,8 +39,8 @@ flags.`)),
 		url, _ := cmd.Flags().GetString("url")
 
 		go func() {
-			scanRunner.Targets <- url
-			close(scanRunner.Targets)
+			scanRunner.Requests <- runner.Request{Target: url}
+			close(scanRunner.Requests)
 		}()
 
 		scanRunner.Run()

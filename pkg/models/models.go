@@ -14,7 +14,8 @@ const (
 
 // Result is a Gowitness result
 type Result struct {
-	ID uint `json:"id" gorm:"primarykey"`
+	ID   uint   `json:"id" gorm:"primarykey"`
+	UUID string `json:"uuid"`
 
 	URL                   string    `json:"url"`
 	ProbedAt              time.Time `json:"probed_at"`

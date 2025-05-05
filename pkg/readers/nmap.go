@@ -7,6 +7,7 @@ import (
 
 	"github.com/lair-framework/go-nmap"
 	"github.com/sensepost/gowitness/internal/islazy"
+	"github.com/sensepost/gowitness/pkg/runner"
 )
 
 // NmapReader is an Nmap results reader
@@ -44,7 +45,7 @@ func NewNmapReader(opts *NmapReaderOptions) *NmapReader {
 }
 
 // Read an nmap file
-func (nr *NmapReader) Read(ch chan<- string) error {
+func (nr *NmapReader) Read(ch chan<- runner.Request) error {
 	defer close(ch)
 
 	xml, err := os.ReadFile(nr.Options.Source)
@@ -100,7 +101,7 @@ func (nr *NmapReader) Read(ch chan<- string) error {
 				if nr.Options.Hostnames {
 					for _, hostaName := range host.Hostnames {
 						for _, target := range nr.urlsFor(hostaName.Name, port.PortId) {
-							ch <- target
+							ch <- runner.Request{Target: target}
 						}
 					}
 				}
@@ -108,12 +109,12 @@ func (nr *NmapReader) Read(ch chan<- string) error {
 				// ip:port candidates
 				if address.AddrType == "ipv4" {
 					for _, target := range nr.urlsFor(address.Addr, port.PortId) {
-						ch <- target
+						ch <- runner.Request{Target: target}
 					}
 				} else {
 					addr := fmt.Sprintf("[%s]", address.Addr)
 					for _, target := range nr.urlsFor(addr, port.PortId) {
-						ch <- target
+						ch <- runner.Request{Target: target}
 					}
 				}
 			}

@@ -26,13 +26,18 @@ type Runner struct {
 	// log handler
 	log *slog.Logger
 
-	// Targets to scan.
+	// Requests to scan.
 	// This would typically be fed from a gowitness/pkg/reader.
-	Targets chan string
+	Requests chan Request
 
 	// in case we need to bail
 	ctx    context.Context
 	cancel context.CancelFunc
+}
+
+type Request struct {
+	Target string
+	Uuid   string
 }
 
 // New gets a new Runner ready for probing.
@@ -78,7 +83,7 @@ func NewRunner(logger *slog.Logger, driver Driver, opts Options, writers []write
 		Wappalyzer: wap,
 		options:    opts,
 		writers:    writers,
-		Targets:    make(chan string),
+		Requests:   make(chan Request),
 		log:        logger,
 		ctx:        ctx,
 		cancel:     cancel,
@@ -126,10 +131,12 @@ func (run *Runner) Run() {
 				select {
 				case <-run.ctx.Done():
 					return
-				case target, ok := <-run.Targets:
+				case req, ok := <-run.Requests:
 					if !ok {
 						return
 					}
+					uuid := req.Uuid
+					target := req.Target
 
 					// validate the target
 					if err := run.checkUrl(target); err != nil {
@@ -154,6 +161,8 @@ func (run *Runner) Run() {
 						}
 						continue
 					}
+
+					result.UUID = uuid
 
 					// assume that status code 0 means there was no information, so
 					// don't send anything to writers.

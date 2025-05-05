@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/sensepost/gowitness/internal/islazy"
+	"github.com/sensepost/gowitness/pkg/runner"
 )
 
 // FileReader is a reader that expects a file with targets that
@@ -38,7 +39,7 @@ func NewFileReader(opts *FileReaderOptions) *FileReader {
 
 // Read from a file that contains targets.
 // FilePath can be "-" indicating that we should read from stdin.
-func (fr *FileReader) Read(ch chan<- string) error {
+func (fr *FileReader) Read(ch chan<- runner.Request) error {
 	defer close(ch)
 
 	var file *os.File
@@ -65,7 +66,7 @@ func (fr *FileReader) Read(ch chan<- string) error {
 		}
 
 		for _, url := range fr.urlsFor(candidate, ports) {
-			ch <- url
+			ch <- runner.Request{Target: url}
 		}
 	}
 

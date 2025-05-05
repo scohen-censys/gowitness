@@ -79,7 +79,7 @@ func (h *ApiHandler) SubmitSingleHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	runner, err := runner.NewRunner(logger, driver, *options, []writers.Writer{writer})
+	run, err := runner.NewRunner(logger, driver, *options, []writers.Writer{writer})
 	if err != nil {
 		log.Error("error starting runner", "err", err)
 		http.Error(w, "Error starting runner", http.StatusInternalServerError)
@@ -87,12 +87,12 @@ func (h *ApiHandler) SubmitSingleHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	go func() {
-		runner.Targets <- request.URL
-		close(runner.Targets)
+		run.Requests <- runner.Request{Target: request.URL}
+		close(run.Requests)
 	}()
 
-	runner.Run()
-	runner.Close()
+	run.Run()
+	run.Close()
 
 	jsonData, err := json.Marshal(writer.GetLatest())
 	if err != nil {

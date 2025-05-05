@@ -55,7 +55,7 @@ flags.`)),
 
 		reader := readers.NewCidrReader(cidrCmdOptions)
 		go func() {
-			if err := reader.Read(scanRunner.Targets); err != nil {
+			if err := reader.Read(scanRunner.Requests); err != nil {
 				log.Error("error in reader.Read", "err", err)
 				return
 			}

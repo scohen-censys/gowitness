@@ -108,15 +108,15 @@ func (h *ApiHandler) SubmitHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // dispatchRunner run's a runner in a separate goroutine
-func dispatchRunner(runner *runner.Runner, targets []string) {
+func dispatchRunner(run *runner.Runner, targets []string) {
 	// feed in targets
 	go func() {
 		for _, url := range targets {
-			runner.Targets <- url
+			run.Requests <- runner.Request{Target: url}
 		}
-		close(runner.Targets)
+		close(run.Requests)
 	}()
 
-	runner.Run()
-	runner.Close()
+	run.Run()
+	run.Close()
 }

@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/sensepost/gowitness/internal/islazy"
+	"github.com/sensepost/gowitness/pkg/runner"
 )
 
 // NessusReader is a Nessus file reader
@@ -52,7 +53,7 @@ func NewNessusReader(opts *NessusReaderOptions) *NessusReader {
 	}
 }
 
-func (nr *NessusReader) Read(ch chan<- string) error {
+func (nr *NessusReader) Read(ch chan<- runner.Request) error {
 	defer close(ch)
 
 	nessus, err := os.Open(nr.Options.Source)
@@ -123,7 +124,7 @@ func (nr *NessusReader) Read(ch chan<- string) error {
 
 	for host, ports := range targets {
 		for _, target := range nr.urlsFor(host, ports) {
-			ch <- target
+			ch <- runner.Request{Target: target}
 		}
 	}
 
