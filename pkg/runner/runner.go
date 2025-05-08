@@ -55,7 +55,7 @@ func NewRunner(logger *slog.Logger, driver Driver, opts Options, writers []write
 	}
 
 	// screenshot format check
-	if !islazy.SliceHasStr([]string{"jpeg", "png"}, opts.Scan.ScreenshotFormat) {
+	if !islazy.SliceHasStr([]string{"jpeg", "png", "webp"}, opts.Scan.ScreenshotFormat) {
 		return nil, errors.New("invalid screenshot format")
 	}
 
